@@ -14,6 +14,9 @@ import Link from "next/link";
 import {Book, CalendarIcon, Contact2, Facebook, Instagram, Twitter} from "lucide-react";
 import {useToast} from "@/hooks/use-toast";
 import {Toaster} from "@/components/ui/toaster";
+import { useAuthState } from 'react-firebase-hooks/auth';
+import { auth } from '@/lib/firebase';
+import Logout from "@/components/auth/Logout";
 
 const featuredBooks = [
   {
@@ -83,6 +86,8 @@ export default function Home() {
 }
 
 function Navbar() {
+  const [user, loading, error] = useAuthState(auth);
+
   return (
     <nav className="bg-background py-4 shadow-md sticky top-0 z-10">
       <div className="container mx-auto px-4 flex items-center justify-between">
@@ -99,9 +104,18 @@ function Navbar() {
           <Link href="/events" className="hover:text-secondary transition-colors">
             Events
           </Link>
-          <Link href="/login" className="hover:text-secondary transition-colors">
-            Login/Register
-          </Link>
+          {user ? (
+            <Logout />
+          ) : (
+            <>
+              <Link href="/login" className="hover:text-secondary transition-colors">
+                Login
+              </Link>
+              <Link href="/register" className="hover:text-secondary transition-colors">
+                Register
+              </Link>
+            </>
+          )}
         </div>
       </div>
     </nav>
@@ -317,3 +331,4 @@ function Footer() {
     </footer>
   );
 }
+
