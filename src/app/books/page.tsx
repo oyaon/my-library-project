@@ -5,21 +5,15 @@ import BookManagement from "@/components/books/BookManagement";
 import {useAuth, UserRoles} from "@/components/auth/AuthContext";
 
 const BooksPage = () => {
-  const { user, role } = useAuth();
+  const { role } = useAuth();
 
-  if (role !== UserRoles.ADMIN && role !== UserRoles.LIBRARIAN) {
-    return (
-      <div>
-        <h1>Books</h1>
-        <BookList />
-      </div>
-    );
-  }
+  // Only admins and librarians can manage books
+  const canManageBooks = role === UserRoles.ADMIN || role === UserRoles.LIBRARIAN;
 
   return (
     <div>
       <h1>Books</h1>
-      <BookManagement />
+      {canManageBooks && <BookManagement />}
       <BookList />
     </div>
   );

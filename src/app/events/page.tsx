@@ -5,7 +5,7 @@ import EventManagement from "@/components/events/EventManagement";
 import {useAuth, UserRoles} from "@/components/auth/AuthContext";
 
 const EventsPage = () => {
-  const { user, role } = useAuth();
+  const { role } = useAuth();
 
   // Only admins and librarians can manage events
   const canManageEvents = role === UserRoles.ADMIN || role === UserRoles.LIBRARIAN;
