@@ -50,18 +50,17 @@ export async function getBooks(): Promise<Book[]> {
 
 export const searchBooks = async (searchTerm: string): Promise<Book[]> => {
   try {
-    if (!searchTerm) {
-      return getBooks(); // If no search term, return all books
+    const booksCollectionRef = collection(db, BOOKS_COLLECTION);
+    let q = query(booksCollectionRef);
+
+    if (searchTerm) {
+      q = query(booksCollectionRef,
+        where('title', '>=', searchTerm),
+        where('title', '<=', searchTerm + '\uf8ff')
+      );
     }
 
-    const booksCollectionRef = collection(db, BOOKS_COLLECTION);
-    // Create a query to search for books where the title contains the search term
-    const q = query(booksCollectionRef, 
-      where('title', '>=', searchTerm),
-      where('title', '<=', searchTerm + '\uf8ff') //'\uf8ff' is the last code point in the Unicode Basic Multilingual Plane, used for range queries
-    );
     const snapshot = await getDocs(q);
-    
     return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Book));
   } catch (error: any) {
     console.error("Error searching books:", error.message);
