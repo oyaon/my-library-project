@@ -11,23 +11,21 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
-let app;
-let auth;
-let db;
+let app: any;
+let auth: any;
+let db: any;
 
-// Check if apiKey is defined before initializing Firebase
-if (firebaseConfig.apiKey) {
-  try {
-    app = initializeApp(firebaseConfig);
-    auth = getAuth(app);
-    db = getFirestore(app); // Initialize Firestore
-  } catch (error) {
-    console.error("Firebase initialization error:", error);
+try {
+  app = initializeApp(firebaseConfig);
+  auth = getAuth(app);
+  db = getFirestore(app); // Initialize Firestore
+} catch (error: any) {
+  console.error("Firebase initialization error:", error.message);
+  // Handle the error appropriately, e.g., display an error message to the user
+  // or disable Firebase-related features.
+  if (error.code === 'auth/api-key-not-valid') {
+    console.error("Invalid Firebase API key. Please check your environment variables.");
   }
-} else {
-  const errorMessage = "Firebase API key is not defined. Please set the NEXT_PUBLIC_FIREBASE_API_KEY environment variable.";
-  console.error(errorMessage);
-  throw new Error(errorMessage);
 }
 
 export { auth, app, db }; // Export firestore
