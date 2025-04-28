@@ -109,7 +109,11 @@ export default function Home() {
           className="mb-4"
         />
         {/* Pass description to BookRecommendations component */}
-        {isClient && <BookRecommendations userDescription={userDescription} />}
+        {isClient ? (
+          <BookRecommendations userDescription={userDescription} />
+        ) : (
+          <Skeleton height={40} width={200} />
+        )}
       </div>
        {isClient && <Chatbot />}
       <UpcomingEvents/>
@@ -347,6 +351,7 @@ function Footer() {
     </footer>
   );
 }
+
 
 
 
