@@ -10,6 +10,22 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
-const app = initializeApp(firebaseConfig);
-export const auth = getAuth(app);
+let app;
+let auth;
+
+// Check if apiKey is defined before initializing Firebase
+if (firebaseConfig.apiKey) {
+  try {
+    app = initializeApp(firebaseConfig);
+    auth = getAuth(app);
+  } catch (error) {
+    console.error("Firebase initialization error:", error);
+  }
+} else {
+  const errorMessage = "Firebase API key is not defined. Please set the NEXT_PUBLIC_FIREBASE_API_KEY environment variable.";
+  console.error(errorMessage);
+  throw new Error(errorMessage);
+}
+
+export { auth, app };
 export default app;
