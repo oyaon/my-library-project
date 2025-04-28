@@ -14,9 +14,9 @@ import Link from "next/link";
 import {Book, CalendarIcon, Contact2, Facebook, Instagram, Twitter} from "lucide-react";
 import {useToast} from "@/hooks/use-toast";
 import {Toaster} from "@/components/ui/toaster";
-import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth } from '@/lib/firebase';
 import Logout from "@/components/auth/Logout";
+import {useAuth} from "@/components/auth/AuthContext";
 
 const featuredBooks = [
   {
@@ -86,7 +86,7 @@ export default function Home() {
 }
 
 function Navbar() {
-  const [user, loading, error] = useAuthState(auth);
+  const {user, loading} = useAuth();
 
   return (
     <nav className="bg-background py-4 shadow-md sticky top-0 z-10">
