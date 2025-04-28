@@ -18,6 +18,7 @@ import { auth } from '@/lib/firebase';
 import Logout from "@/components/auth/Logout";
 import {useAuth} from "@/components/auth/AuthContext";
 import BookRecommendations from "@/components/recommendations/BookRecommendations";
+import Chatbot from "@/components/chatbot/Chatbot";
 
 const featuredBooks = [
   {
@@ -95,6 +96,7 @@ export default function Home() {
         {/* Pass description to BookRecommendations component */}
         <BookRecommendations userDescription={userDescription} />
       </div>
+      <Chatbot />
       <UpcomingEvents/>
       <MembershipPromo/>
       <Footer/>
@@ -355,3 +357,4 @@ function Footer() {
     </footer>
   );
 }
+
