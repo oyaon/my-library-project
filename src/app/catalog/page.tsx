@@ -1,59 +1,54 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from 'react';
-import { getBooks, searchBooks } from '@/services/bookService';
-import type { Book } from '@/types/Book';
-import BookList from "@/components/books/BookList";
-import { Input } from "@/components/ui/input";
-import { motion } from "framer-motion";
+import { useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
 
-const CatalogPage = () => {
+interface Book {
+  id: string;
+  title: string;
+  author: string;
+  coverImageUrl?: string;
+}
+
+export default function CatalogPage() {
   const [books, setBooks] = useState<Book[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
-    const fetchBooks = async () => {
-      setIsLoading(true);
+    async function fetchBooks() {
       try {
-        const fetchedBooks = searchTerm ? await searchBooks(searchTerm) : await getBooks();
-        setBooks(fetchedBooks);
+        const res = await fetch('/api/books');
+        const data = await res.json();
+        setBooks(data);
       } catch (error) {
-        console.error("Failed to fetch books", error);
-      } finally {
-        setIsLoading(false);
+        console.error('Failed to fetch books:', error);
       }
-    };
+    }
 
     fetchBooks();
-  }, [searchTerm]);
-
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(e.target.value);
-  };
+  }, []);
 
   return (
-    <motion.div
-      className="container mx-auto py-6"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.5 }}
-    >
-      <h1 className="text-2xl font-semibold mb-4">Book Catalog</h1>
-      <Input
-        type="text"
-        placeholder="Search books by title"
-        value={searchTerm}
-        onChange={handleSearchChange}
-        className="mb-4"
-      />
-      {isLoading ? (
-        <p>Loading books...</p>
-      ) : (
-        <BookList books={books} />
-      )}
-    </motion.div>
+    <div className="container mx-auto py-8">
+      <h1 className="text-3xl font-bold mb-6">Book Catalog</h1>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+        {books.map((book) => (
+          <motion.div
+            key={book.id}
+            className="bg-white shadow-md rounded-lg p-4 hover:shadow-xl transition-shadow"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+          >
+            <img
+              src={book.coverImageUrl || '/placeholder.jpg'}
+              alt={book.title}
+              className="w-full h-48 object-cover rounded-md"
+            />
+            <h2 className="text-xl font-semibold mt-4">{book.title}</h2>
+            <p className="text-gray-600">{book.author}</p>
+          </motion.div>
+        ))}
+      </div>
+    </div>
   );
-};
-
-export default CatalogPage;
+}
