@@ -7,142 +7,153 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from "@/hooks/use-toast";
+import * as z from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+// Define Zod schema for book validation
+const bookSchema = z.object({
+  title: z.string().min(2, { message: "Title must be at least 2 characters." }),
+  author: z.string().min(2, { message: "Author must be at least 2 characters." }),
+  isbn: z.string().regex(/^\d{13}$/, { message: "Invalid ISBN" }),
+  description: z.string().optional(),
+  coverImageUrl: z.string().url({ message: "Invalid URL" }),
+});
+
+type BookSchemaType = z.infer<typeof bookSchema>;
 
 const BookManagement = () => {
-  const [title, setTitle] = useState('');
-  const [author, setAuthor] = useState('');
-  const [isbn, setIsbn] = useState('');
-  const [description, setDescription] = useState('');
-  const [coverImageUrl, setCoverImageUrl] = useState('');
-  const [selectedBookId, setSelectedBookId] = useState<string | null>(null); // Track which book is being edited
-    const { toast } = useToast();
+  const [selectedBookId, setSelectedBookId] = useState<string | null>(null);
+  const { toast } = useToast();
 
-  const handleCreateBook = async () => {
+  const { register, handleSubmit, reset, formState: { errors } } = useForm<BookSchemaType>({
+    resolver: zodResolver(bookSchema),
+  });
+
+  const handleCreateBook = async (data: BookSchemaType) => {
     try {
-      const newBookId = await createBook({ title, author, isbn, description, coverImageUrl });
-        toast({
-            title: "Book Created",
-            description: `Book ${title} has been created`
-        })
-      clearInputFields();
+      const newBookId = await createBook(data);
+      toast({
+        title: "Book Created",
+        description: `Book ${data.title} has been created`
+      });
+      reset();
     } catch (error) {
       console.error("Failed to create book", error);
-        toast({
-            variant: "destructive",
-            title: "Error",
-            description: `Failed to create book`
-        })
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: `Failed to create book`
+      });
     }
   };
 
-  const handleUpdateBook = async () => {
+  const handleUpdateBook = async (data: BookSchemaType) => {
     if (!selectedBookId) {
       console.warn("No book selected for update.");
-        toast({
-            variant: "destructive",
-            title: "Error",
-            description: `No book selected for update.`
-        })
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: `No book selected for update.`
+      });
       return;
     }
     try {
-      await updateBook(selectedBookId, { title, author, isbn, description, coverImageUrl });
-        toast({
-            title: "Book Updated",
-            description: `Book ${title} has been updated`
-        })
-      clearInputFields();
-      setSelectedBookId(null); // Clear selected book after update
+      await updateBook(selectedBookId, data);
+      toast({
+        title: "Book Updated",
+        description: `Book ${data.title} has been updated`
+      });
+      reset();
+      setSelectedBookId(null);
     } catch (error) {
       console.error("Failed to update book", error);
-        toast({
-            variant: "destructive",
-            title: "Error",
-            description: `Failed to update book`
-        })
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: `Failed to update book`
+      });
     }
   };
 
   const handleDeleteBook = async () => {
     if (!selectedBookId) {
       console.warn("No book selected for deletion.");
-        toast({
-            variant: "destructive",
-            title: "Error",
-            description: `No book selected for deletion.`
-        })
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: `No book selected for deletion.`
+      });
       return;
     }
     try {
       await deleteBook(selectedBookId);
-        toast({
-            title: "Book Deleted",
-            description: `Book has been deleted`
-        })
-      clearInputFields();
-      setSelectedBookId(null); // Clear selected book after delete
+      toast({
+        title: "Book Deleted",
+        description: `Book has been deleted`
+      });
+      reset();
+      setSelectedBookId(null);
     } catch (error) {
       console.error("Failed to delete book", error);
-        toast({
-            variant: "destructive",
-            title: "Error",
-            description: `Failed to delete book`
-        })
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: `Failed to delete book`
+      });
     }
-  };
-
-  const clearInputFields = () => {
-    setTitle('');
-    setAuthor('');
-    setIsbn('');
-    setDescription('');
-    setCoverImageUrl('');
   };
 
   return (
     <div>
       <h2 className="text-2xl font-semibold mb-4">Book Management</h2>
 
-      <Input
-        type="text"
-        placeholder="Title"
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-        className="mb-2"
-      />
-      <Input
-        type="text"
-        placeholder="Author"
-        value={author}
-        onChange={(e) => setAuthor(e.target.value)}
-        className="mb-2"
-      />
-      <Input
-        type="text"
-        placeholder="ISBN"
-        value={isbn}
-        onChange={(e) => setIsbn(e.target.value)}
-        className="mb-2"
-      />
-      <Textarea
-        placeholder="Description"
-        value={description}
-        onChange={(e) => setDescription(e.target.value)}
-        className="mb-2"
-      />
-      <Input
-        type="text"
-        placeholder="Cover Image URL"
-        value={coverImageUrl}
-        onChange={(e) => setCoverImageUrl(e.target.value)}
-        className="mb-4"
-      />
+      <form onSubmit={handleSubmit(selectedBookId ? handleUpdateBook : handleCreateBook)}>
+        <Input
+          type="text"
+          placeholder="Title"
+          {...register("title")}
+          className="mb-2"
+        />
+        {errors.title && <p className="text-red-500">{errors.title.message}</p>}
 
-      <div className="flex gap-2">
-        <Button onClick={handleCreateBook}>Create Book</Button>
-        <Button onClick={handleUpdateBook} disabled={!selectedBookId}>Update Book</Button>
-        <Button onClick={handleDeleteBook} disabled={!selectedBookId}>Delete Book</Button>
-      </div>
+        <Input
+          type="text"
+          placeholder="Author"
+          {...register("author")}
+          className="mb-2"
+        />
+        {errors.author && <p className="text-red-500">{errors.author.message}</p>}
+
+        <Input
+          type="text"
+          placeholder="ISBN"
+          {...register("isbn")}
+          className="mb-2"
+        />
+        {errors.isbn && <p className="text-red-500">{errors.isbn.message}</p>}
+
+        <Textarea
+          placeholder="Description"
+          {...register("description")}
+          className="mb-2"
+        />
+
+        <Input
+          type="text"
+          placeholder="Cover Image URL"
+          {...register("coverImageUrl")}
+          className="mb-4"
+        />
+        {errors.coverImageUrl && <p className="text-red-500">{errors.coverImageUrl.message}</p>}
+
+        <div className="flex gap-2">
+          <Button type="submit">{selectedBookId ? "Update Book" : "Create Book"}</Button>
+          {selectedBookId && (
+            <Button onClick={handleDeleteBook} variant="destructive">Delete Book</Button>
+          )}
+        </div>
+      </form>
     </div>
   );
 };

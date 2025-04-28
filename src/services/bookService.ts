@@ -11,9 +11,9 @@ export async function createBook(book: Omit<Book, 'id'>): Promise<string> {
     const booksCollectionRef = collection(db, BOOKS_COLLECTION);
     const docRef = await addDoc(booksCollectionRef, book);
     return docRef.id;
-  } catch (error) {
-    console.error("Error creating book:", error);
-    throw error;
+  } catch (error: any) {
+    console.error("Error creating book:", error.message);
+    throw new Error(`Failed to create book: ${error.message}`);
   }
 }
 
@@ -21,9 +21,9 @@ export async function updateBook(bookId: string, updates: Partial<Book>): Promis
   try {
     const bookDocRef = doc(db, BOOKS_COLLECTION, bookId);
     await updateDoc(bookDocRef, updates);
-  } catch (error) {
-    console.error("Error updating book:", error);
-    throw error;
+  } catch (error: any) {
+    console.error("Error updating book:", error.message);
+    throw new Error(`Failed to update book: ${error.message}`);
   }
 }
 
@@ -31,9 +31,9 @@ export async function deleteBook(bookId: string): Promise<void> {
   try {
     const bookDocRef = doc(db, BOOKS_COLLECTION, bookId);
     await deleteDoc(bookDocRef);
-  } catch (error) {
-    console.error("Error deleting book:", error);
-    throw error;
+  } catch (error: any) {
+    console.error("Error deleting book:", error.message);
+    throw new Error(`Failed to delete book: ${error.message}`);
   }
 }
 
@@ -42,9 +42,9 @@ export async function getBooks(): Promise<Book[]> {
     const booksCollectionRef = collection(db, BOOKS_COLLECTION);
     const snapshot = await getDocs(booksCollectionRef);
     return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Book));
-  } catch (error) {
-    console.error("Error getting books:", error);
-    throw error;
+  } catch (error: any) {
+    console.error("Error getting books:", error.message);
+    throw new Error(`Failed to get books: ${error.message}`);
   }
 }
 
@@ -58,12 +58,12 @@ export const searchBooks = async (query: string, filters = {}): Promise<Book[]> 
     });
     
     // Add full-text search if needed
-    // if (query) q = where('searchKeywords', 'array-contains', query.toLowerCase());
+    if (query) q = where('searchKeywords', 'array-contains', query.toLowerCase());
     
     const snapshot = await getDocs(q);
     return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Book));
-  } catch (error) {
-    console.error("Search failed:", error);
-    throw new Error('Search operation failed');
+  } catch (error: any) {
+    console.error("Search failed:", error.message);
+    throw new Error(`Search operation failed: ${error.message}`);
   }
 };
