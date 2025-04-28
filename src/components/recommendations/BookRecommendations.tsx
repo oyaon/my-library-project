@@ -15,9 +15,9 @@ interface BookRecommendationsProps {
 
 const BookRecommendations = ({ userDescription }: BookRecommendationsProps) => {
   const { user } = useAuth();
-  const [recommendations, setRecommendations] = useState<RecommendBooksOutput | null>(null);
-  const [recommendedBooks, setRecommendedBooks] = useState<Book[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [recommendations, setRecommendations] = useState<Book[]>([]);
+  const [reasoning, setReasoning] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
 
@@ -28,6 +28,9 @@ const BookRecommendations = ({ userDescription }: BookRecommendationsProps) => {
       }
 
       try {
+        setLoading(true);
+        setError(null);
+
         const input = {
           genrePreferences: ['Fiction', 'Thriller'], // Example preferences
           authorPreferences: ['Jane Austen', 'Haruki Murakami'], // Example preferences
@@ -37,7 +40,6 @@ const BookRecommendations = ({ userDescription }: BookRecommendationsProps) => {
         };
 
         const recommendationsData = await recommendBooks(input);
-        setRecommendations(recommendationsData);
 
         if (recommendationsData && recommendationsData.recommendedBookIds) {
           // Fetch book details for the recommended book IDs
@@ -45,7 +47,12 @@ const BookRecommendations = ({ userDescription }: BookRecommendationsProps) => {
           const filteredBooks = allBooks.filter(book =>
             recommendationsData.recommendedBookIds.includes(book.id || '')
           );
-          setRecommendedBooks(filteredBooks);
+          setRecommendations(filteredBooks);
+          setReasoning(recommendationsData.reasoning); // Correctly set the reasoning
+        } else {
+          setRecommendations([]);
+          setReasoning('');
+          setError("No recommendations found.");
         }
       } catch (err: any) {
         setError(err.message || 'Failed to fetch book recommendations');
@@ -71,7 +78,7 @@ const BookRecommendations = ({ userDescription }: BookRecommendationsProps) => {
     return <div>Error: {error}</div>;
   }
 
-  if (!recommendations || !recommendations.recommendedBookIds.length) {
+  if (!recommendations || !recommendations.length) {
     return <div>No book recommendations found.</div>;
   }
 
@@ -79,7 +86,7 @@ const BookRecommendations = ({ userDescription }: BookRecommendationsProps) => {
     <div>
       <h2>Book Recommendations</h2>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {recommendedBooks.map((book) => (
+        {recommendations.map((book) => (
           <Card key={book.id} className="overflow-hidden">
             <Image
               src={book.coverImageUrl}
@@ -97,7 +104,7 @@ const BookRecommendations = ({ userDescription }: BookRecommendationsProps) => {
       </div>
       <div>
         <h3>Reasoning</h3>
-        <p>{recommendations.reasoning}</p>
+        <p>{reasoning}</p>
       </div>
     </div>
   );
