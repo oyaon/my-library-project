@@ -1,42 +1,67 @@
 "use client"
 
 import * as React from "react"
-import * as CarouselPrimitive from "@radix-ui/react-carousel"
+// import * as CarouselPrimitive from "@radix-ui/react-carousel"
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 
-const Carousel = CarouselPrimitive.Root
+const Carousel = React.forwardRef<
+  HTMLDivElement,
+  React.ComponentProps<"div">
+>(({ className, ...props }, ref) => (
+  <div
+    ref={ref}
+    className={cn("w-full overflow-x-auto", className)}
+    {...props}
+  >
+    {/* Placeholder for CarouselPrimitive.Root */}
+    
+      {props.children}
+    
+  </div>
+));
 
-const CarouselViewport = CarouselPrimitive.Viewport
+Carousel.displayName = "Carousel";
+
+const CarouselViewport = React.forwardRef<
+  HTMLDivElement,
+  React.ComponentProps<"div">
+>(({ className, ...props }, ref) => (
+  <div ref={ref} className={cn("relative", className)} {...props} />
+));
+
+CarouselViewport.displayName = "CarouselViewport";
 
 const CarouselContent = React.forwardRef<
-  React.ElementRef<typeof CarouselPrimitive.Content>,
-  React.ComponentPropsWithoutRef<typeof CarouselPrimitive.Content>
+  HTMLDivElement,
+  React.ComponentProps<"div">
 >(({ className, ...props }, ref) => (
-  <CarouselPrimitive.Content
+  <div
     ref={ref}
     className={cn(
-      "flex h-full w-full overflow-hidden touch-pan-y snap-mandatory snap-x",
+      "flex snap-mandatory snap-x overflow-x-scroll scroll-smooth",
       className
     )}
+    style={{scrollSnapType: 'x mandatory'}}
     {...props}
   />
-))
-CarouselContent.displayName = CarouselPrimitive.Content.displayName
+));
+CarouselContent.displayName = "CarouselContent";
 
 const CarouselItem = React.forwardRef<
-  React.ElementRef<typeof CarouselPrimitive.Item>,
-  React.ComponentPropsWithoutRef<typeof CarouselPrimitive.Item>
+  HTMLDivElement,
+  React.ComponentProps<"div">
 >(({ className, ...props }, ref) => (
-  <CarouselPrimitive.Item
+  <div
     ref={ref}
-    className={cn("snap-start relative w-full h-full", className)}
+    className={cn("snap-start shrink-0", className)}
+    style={{scrollSnapAlign: 'start'}}
     {...props}
   />
-))
-CarouselItem.displayName = CarouselPrimitive.Item.displayName
+));
+CarouselItem.displayName = "CarouselItem";
 
 const CarouselNext = React.forwardRef<
   React.ElementRef<typeof Button>,
