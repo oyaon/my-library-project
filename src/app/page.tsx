@@ -95,7 +95,7 @@ export default function Home() {
         {/* Pass description to BookRecommendations component */}
         {isClient && <BookRecommendations userDescription={userDescription} />}
       </div>
-      <Chatbot />
+       {isClient && <Chatbot />}
       <UpcomingEvents/>
       <MembershipPromo/>
       <Footer/>
@@ -368,6 +368,7 @@ function Footer() {
     </footer>
   );
 }
+
 
 
 
