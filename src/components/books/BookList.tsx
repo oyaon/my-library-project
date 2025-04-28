@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
+import { Skeleton } from "@/components/ui/skeleton";
 
 const ITEMS_PER_PAGE = 6;
 
@@ -14,9 +15,11 @@ const BookList = () => {
   const [books, setBooks] = useState<Book[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
+  const [isLoading, setIsLoading] = useState(true); // Add loading state
 
   useEffect(() => {
     const fetchBooks = async () => {
+      setIsLoading(true); // Set loading to true when fetching starts
       try {
         let fetchedBooks: Book[];
         if (searchTerm) {
@@ -27,6 +30,8 @@ const BookList = () => {
         setBooks(fetchedBooks);
       } catch (error) {
         console.error("Failed to fetch books", error);
+      } finally {
+        setIsLoading(false); // Set loading to false when fetching completes
       }
     };
 
@@ -62,29 +67,41 @@ const BookList = () => {
       />
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {displayedBooks.map((book) => (
-          <Card key={book.id} className="overflow-hidden">
-            <Image
-              src={book.coverImageUrl}
-              alt={book.title}
-              width={200}
-              height={300}
-              className="object-cover rounded-md aspect-[2/3] hover:scale-105 transition-transform"
-            />
-            <CardContent className="p-4">
-              <CardTitle className="text-sm font-semibold">{book.title}</CardTitle>
-              <CardDescription className="text-xs text-muted-foreground">{book.author}</CardDescription>
-            </CardContent>
-          </Card>
-        ))}
+        {isLoading ? ( // Show skeleton loader while loading
+          Array.from({ length: ITEMS_PER_PAGE }).map((_, index) => (
+            <Card key={`skeleton-${index}`} className="overflow-hidden">
+              <Skeleton className="h-[300px] w-full object-cover rounded-md aspect-[2/3]" />
+              <CardContent className="p-4">
+                <Skeleton className="h-6 w-full mb-2" />
+                <Skeleton className="h-4 w-3/4" />
+              </CardContent>
+            </Card>
+          ))
+        ) : (
+          displayedBooks.map((book) => (
+            <Card key={book.id} className="overflow-hidden">
+              <Image
+                src={book.coverImageUrl}
+                alt={book.title}
+                width={200}
+                height={300}
+                className="object-cover rounded-md aspect-[2/3] hover:scale-105 transition-transform"
+              />
+              <CardContent className="p-4">
+                <CardTitle className="text-sm font-semibold">{book.title}</CardTitle>
+                <CardDescription className="text-xs text-muted-foreground">{book.author}</CardDescription>
+              </CardContent>
+            </Card>
+          ))
+        )}
       </div>
 
       <div className="flex justify-between items-center mt-4">
-        <Button onClick={goToPreviousPage} disabled={currentPage === 1}>
+        <Button onClick={goToPreviousPage} disabled={currentPage === 1 || isLoading}>
           Previous
         </Button>
         <span>{`Page ${currentPage} of ${totalPages}`}</span>
-        <Button onClick={goToNextPage} disabled={currentPage === totalPages}>
+        <Button onClick={goToNextPage} disabled={currentPage === totalPages || isLoading}>
           Next
         </Button>
       </div>
