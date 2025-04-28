@@ -1,3 +1,4 @@
+
 # Firebase Studio
 
 This is a NextJS starter in Firebase Studio.
@@ -45,3 +46,23 @@ Example:
 If you have a query that filters books by `author` and sorts them by `title`, you'll need a composite index on `author` (ascending) and `title` (ascending).
 
 By carefully creating the necessary indexes, you can significantly improve the performance and scalability of your Firestore database.
+
+## Setting up test users with different roles
+
+To test the role-based access control in your application, you need to create users with different roles in Firebase Authentication. You can do this manually through the Firebase console or programmatically using the Firebase Admin SDK.
+
+**Manual setup (Firebase Console):**
+
+1.  Go to the [Firebase Console](https://console.firebase.google.com/).
+2.  Select your project.
+3.  Navigate to "Authentication" -> "Users".
+4.  Add new users with the following email addresses:
+    *   `admin@admin.com` (Admin role)
+    *   `librarian@librarian.com` (Librarian role)
+    *   `member@member.com` (Member role)
+5.  You can set any passwords for these users.
+
+The application is designed to assign the corresponding roles to the users with the listed email suffix.
+
+Now you can log in with these users to test the different roles.
+    
