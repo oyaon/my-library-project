@@ -17,6 +17,7 @@ import {Toaster} from "@/components/ui/toaster";
 import { auth } from '@/lib/firebase';
 import Logout from "@/components/auth/Logout";
 import {useAuth} from "@/components/auth/AuthContext";
+import BookRecommendations from "@/components/recommendations/BookRecommendations";
 
 const featuredBooks = [
   {
@@ -77,6 +78,7 @@ export default function Home() {
       <HeroSection/>
       <AboutSection/>
       <FeaturedBooks/>
+      <BookRecommendations/>
       <UpcomingEvents/>
       <MembershipPromo/>
       <Footer/>
@@ -337,4 +339,3 @@ function Footer() {
     </footer>
   );
 }
-
