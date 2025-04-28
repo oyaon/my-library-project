@@ -7,13 +7,19 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import Image from 'next/image';
 import type { Book } from '@/types/Book';
 import { getBooks } from '@/services/bookService';
+import {useToast} from "@/hooks/use-toast";
 
-const BookRecommendations = () => {
+interface BookRecommendationsProps {
+  userDescription: string;
+}
+
+const BookRecommendations = ({ userDescription }: BookRecommendationsProps) => {
   const { user } = useAuth();
   const [recommendations, setRecommendations] = useState<RecommendBooksOutput | null>(null);
   const [recommendedBooks, setRecommendedBooks] = useState<Book[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { toast } = useToast();
 
   useEffect(() => {
     const fetchRecommendations = async () => {
@@ -25,8 +31,9 @@ const BookRecommendations = () => {
         const input = {
           genrePreferences: ['Fiction', 'Thriller'], // Example preferences
           authorPreferences: ['Jane Austen', 'Haruki Murakami'], // Example preferences
-          recentBorrowedBooks: [], // Example - can be populated from user's loan history
+          recentBorrowedBookIds: [], // Example - can be populated from user's loan history
           userId: user.uid,
+          description: userDescription,
         };
 
         const recommendationsData = await recommendBooks(input);
@@ -43,13 +50,18 @@ const BookRecommendations = () => {
       } catch (err: any) {
         setError(err.message || 'Failed to fetch book recommendations');
         console.error("Error fetching recommendations:", err);
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: `Failed to fetch recommendations: ${err.message}`,
+        });
       } finally {
         setLoading(false);
       }
     };
 
     fetchRecommendations();
-  }, [user]);
+  }, [user, userDescription, toast]);
 
   if (loading) {
     return <div>Loading book recommendations...</div>;
@@ -82,6 +94,10 @@ const BookRecommendations = () => {
             </CardContent>
           </Card>
         ))}
+      </div>
+      <div>
+        <h3>Reasoning</h3>
+        <p>{recommendations.reasoning}</p>
       </div>
     </div>
   );

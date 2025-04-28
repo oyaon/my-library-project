@@ -67,10 +67,16 @@ const events = [
 
 export default function Home() {
   const [isClient, setIsClient] = useState(false);
+  const {toast} = useToast();
+  const [userDescription, setUserDescription] = useState(''); // User description state
 
   useEffect(() => {
     setIsClient(true);
   }, []);
+
+  const handleDescriptionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setUserDescription(e.target.value);
+  };
 
   return (
     <div className="min-h-screen bg-muted fade-in">
@@ -78,7 +84,17 @@ export default function Home() {
       <HeroSection/>
       <AboutSection/>
       <FeaturedBooks/>
-      <BookRecommendations/>
+      <div className="container mx-auto px-4">
+        <Input
+          type="text"
+          placeholder="Tell us about your reading preferences"
+          value={userDescription}
+          onChange={handleDescriptionChange}
+          className="mb-4"
+        />
+        {/* Pass description to BookRecommendations component */}
+        <BookRecommendations userDescription={userDescription} />
+      </div>
       <UpcomingEvents/>
       <MembershipPromo/>
       <Footer/>
