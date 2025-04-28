@@ -48,22 +48,22 @@ export async function getBooks(): Promise<Book[]> {
   }
 }
 
-export async function searchBooks(searchTerm: string): Promise<Book[]> {
-    try {
-        if (!searchTerm) {
-            return getBooks(); // Return all books if search term is empty
-        }
-
-        const booksCollectionRef = collection(db, BOOKS_COLLECTION);
-        const q = query(
-            booksCollectionRef,
-            where('title', '>=', searchTerm),
-            where('title', '<=', searchTerm + '\uf8ff')
-        );
-        const snapshot = await getDocs(q);
-        return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Book));
-    } catch (error) {
-        console.error("Error searching books:", error);
-        throw error;
-    }
-}
+export const searchBooks = async (query: string, filters = {}): Promise<Book[]> => {
+  try {
+    let q = query(collection(db, 'books'));
+    
+    // Add filters dynamically
+    Object.entries(filters).forEach(([field, value]) => {
+      if (value) q = where(field, '==', value);
+    });
+    
+    // Add full-text search if needed
+    // if (query) q = where('searchKeywords', 'array-contains', query.toLowerCase());
+    
+    const snapshot = await getDocs(q);
+    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Book));
+  } catch (error) {
+    console.error("Search failed:", error);
+    throw new Error('Search operation failed');
+  }
+};
