@@ -67,3 +67,4 @@ export const searchBooks = async (query: string, filters = {}): Promise<Book[]> 
     throw new Error(`Search operation failed: ${error.message}`);
   }
 };
+
