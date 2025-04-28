@@ -100,6 +100,12 @@ export default function Home() {
       <MembershipPromo/>
       <Footer/>
       {isClient && <Toaster/>}
+      {/* Next steps for advanced features:
+           Book reservation system,
+           Mobile app integration (Flutter),
+           Usage analytics dashboard,
+           Bulk import/export functionality
+        */}
     </div>
   );
 }
@@ -362,6 +368,7 @@ function Footer() {
     </footer>
   );
 }
+
 
 
 
