@@ -11,10 +11,9 @@ import {useEffect, useState} from "react";
 import Autoplay from "embla-carousel-autoplay";
 import {ScrollArea} from "@/components/ui/scroll-area";
 import Link from "next/link";
-import {Book, CalendarIcon, Contact2, Facebook, Instagram, Twitter} from "lucide-react";
+import {Contact2, Facebook, Instagram, Twitter} from "lucide-react";
 import {useToast} from "@/hooks/use-toast";
 import {Toaster} from "@/components/ui/toaster";
-import { auth } from '@/lib/firebase';
 import Logout from "@/components/auth/Logout";
 import {useAuth} from "@/components/auth/AuthContext";
 import BookRecommendations from "@/components/recommendations/BookRecommendations";
@@ -94,7 +93,7 @@ export default function Home() {
           className="mb-4"
         />
         {/* Pass description to BookRecommendations component */}
-        <BookRecommendations userDescription={userDescription} />
+        {isClient && <BookRecommendations userDescription={userDescription} />}
       </div>
       <Chatbot />
       <UpcomingEvents/>
@@ -272,6 +271,12 @@ function FeaturedBooks() {
 }
 
 function UpcomingEvents() {
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
   return (
     <section className="py-16 bg-background">
       <div className="container mx-auto px-4">
@@ -285,7 +290,7 @@ function UpcomingEvents() {
               <CardDescription>View events in a calendar format.</CardDescription>
             </CardHeader>
             <CardContent className="grid gap-4">
-              <Calendar/>
+              {isClient && <Calendar/>}
             </CardContent>
           </Card>
           <Card>
@@ -357,4 +362,5 @@ function Footer() {
     </footer>
   );
 }
+
 
