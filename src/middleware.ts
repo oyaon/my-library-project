@@ -11,6 +11,10 @@ const protectedRoutes = [
     route: '/events',
     allowedRoles: ['admin', 'librarian'],
   },
+  {
+    route: '/loans',
+    allowedRoles: ['member', 'librarian', 'admin'],
+  },
   // Add more protected routes as needed
 ];
 
@@ -25,6 +29,9 @@ export async function middleware(req: NextRequest) {
   // Check if the route is protected
   if (isProtectedRoute(pathname)) {
     // Get the user's role from a cookie or authentication context (replace with your actual logic)
+    // You'll need to adapt this part to how you store the user's role.
+
+    // For example, if you set a cookie named 'userRole' after login
     const userRole = req.cookies.get('userRole')?.value || 'guest'; // Default to 'guest' if no role is found
 
     // Find the allowed roles for the route
@@ -55,4 +62,3 @@ export const config = {
     '/((?!api|_next/static|_next/image|favicon\\.ico).*)',
   ],
 };
-
