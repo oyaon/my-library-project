@@ -101,6 +101,9 @@ function Navbar() {
           <Link href="/search" className="hover:text-secondary transition-colors">
             Search
           </Link>
+           <Link href="/books" className="hover:text-secondary transition-colors">
+            Books
+          </Link>
           <Link href="/events" className="hover:text-secondary transition-colors">
             Events
           </Link>
@@ -331,4 +334,3 @@ function Footer() {
     </footer>
   );
 }
-

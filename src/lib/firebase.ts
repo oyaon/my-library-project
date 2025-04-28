@@ -1,5 +1,6 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
+import { getFirestore } from 'firebase/firestore';
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -12,12 +13,14 @@ const firebaseConfig = {
 
 let app;
 let auth;
+let db;
 
 // Check if apiKey is defined before initializing Firebase
 if (firebaseConfig.apiKey) {
   try {
     app = initializeApp(firebaseConfig);
     auth = getAuth(app);
+    db = getFirestore(app); // Initialize Firestore
   } catch (error) {
     console.error("Firebase initialization error:", error);
   }
@@ -27,5 +30,5 @@ if (firebaseConfig.apiKey) {
   throw new Error(errorMessage);
 }
 
-export { auth, app };
+export { auth, app, db }; // Export firestore
 export default app;
