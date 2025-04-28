@@ -7,7 +7,7 @@ import {Calendar} from '@/components/ui/calendar';
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/components/ui/card';
 import {Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious} from "@/components/ui/carousel"
 import {cn} from "@/lib/utils";
-import {useEffect, useState} from "react";
+import {useEffect, useState, useRef} from "react";
 import Autoplay from "embla-carousel-autoplay";
 import {ScrollArea} from "@/components/ui/scroll-area";
 import Link from "next/link";
@@ -69,6 +69,7 @@ export default function Home() {
   const [isClient, setIsClient] = useState(false);
   const {toast} = useToast();
   const [userDescription, setUserDescription] = useState(''); // User description state
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     setIsClient(true);
@@ -78,10 +79,25 @@ export default function Home() {
     setUserDescription(e.target.value);
   };
 
+  // Keyboard navigation - focus on search input when '/' is pressed
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (document.activeElement === document.body && event.key === '/') {
+        event.preventDefault();
+        searchInputRef.current?.focus();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
+
   return (
     <div className="min-h-screen bg-muted fade-in">
       <Navbar/>
-      <HeroSection/>
+      <HeroSection searchInputRef={searchInputRef} />
       <AboutSection/>
       <FeaturedBooks/>
       <div className="container mx-auto px-4">
@@ -153,7 +169,7 @@ function Navbar() {
   );
 }
 
-function HeroSection() {
+function HeroSection({ searchInputRef }: { searchInputRef: React.Ref<HTMLInputElement> }) {
   return (
     <section
       className="relative py-24 bg-cover bg-center"
@@ -168,7 +184,11 @@ function HeroSection() {
           Discover a world of knowledge and stories.
         </p>
         <div className="max-w-xl mx-auto">
-          <Input type="text" placeholder="Search for books, authors, and more"/>
+          <Input
+            type="text"
+            placeholder="Search for books, authors, and more (Press '/' to focus)"
+            ref={searchInputRef}
+          />
           <Button className="mt-4 bg-accent text-accent-foreground hover:bg-accent/80">
             Explore Now
           </Button>
@@ -368,6 +388,7 @@ function Footer() {
     </footer>
   );
 }
+
 
 
 
