@@ -18,6 +18,7 @@ import Logout from "@/components/auth/Logout";
 import {useAuth} from "@/components/auth/AuthContext";
 import BookRecommendations from "@/components/recommendations/BookRecommendations";
 import Chatbot from "@/components/chatbot/Chatbot";
+import { Skeleton } from '@/components/ui/skeleton';
 
 const featuredBooks = [
   {
@@ -206,7 +207,7 @@ function FeaturedBooks() {
         <h2 className="text-3xl font-semibold text-primary mb-8 text-center">
           Featured Books
         </h2>
-        {isClient && (
+        {isClient ? (
           <Carousel
             opts={{
               loop: true,
@@ -246,6 +247,8 @@ function FeaturedBooks() {
             <CarouselPrevious className="left-2"/>
             <CarouselNext className="right-2"/>
           </Carousel>
+        ) : (
+          <Skeleton/>
         )}
       </div>
     </section>
@@ -272,7 +275,7 @@ function UpcomingEvents() {
               <CardDescription>View events in a calendar format.</CardDescription>
             </CardHeader>
             <CardContent className="grid gap-4">
-              {isClient && <Calendar/>}
+              {isClient ? <Calendar/> : <Skeleton/>}
             </CardContent>
           </Card>
           <Card>
@@ -344,6 +347,7 @@ function Footer() {
     </footer>
   );
 }
+
 
 
 
