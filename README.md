@@ -1,68 +1,103 @@
+# Library Hub
 
-# Firebase Studio
+A Next.js starter project with Firebase and Genkit integration, designed for managing library resources.
 
-This is a NextJS starter in Firebase Studio.
+## Features
 
-To get started, take a look at src/app/page.tsx.
+*   **User Authentication:** Implemented with Firebase Authentication.
+*   **Book Catalog:** Displays books fetched from a mock API (`/api/books`). Includes smooth fade-in animations (Framer Motion) and a responsive, mobile-first design (Tailwind CSS).
+*   **APIs:** Basic API for login (`/api/login`).
+*   **UI Foundation:** Uses Shadcn UI components for a consistent look and feel.
+*   **Technology Stack:** Next.js, Firebase, Genkit, Shadcn UI.
+*   **Search:** Implemented book search.
+*   **Basic Authentication:** Basic Authentication Using Middleware.
 
-## Security Rules (Firestore)
+## Next Steps
 
-Remember to define appropriate security rules in your Firebase console to protect your data. You can find documentation on how to do this here: [https://firebase.google.com/docs/firestore/security/get-started](https://firebase.google.com/docs/firestore/security/get-started)
+*   Implement Firestore Security Rules.
+*   Enhance form validation.
+*   Standardize error responses in API services.
+*   Resolve hydration errors.
+*   Implement unit tests for services.
 
-Example rules:
+## Getting Started
+
+1.  **Clone the repository:**
+
+    ```bash
+    git clone [repository-url]
+    cd [project-directory]
+    ```
+
+2.  **Install dependencies:**
+
+    ```bash
+    npm install
+    # or
+    yarn install
+    ```
+
+3.  **Set up Firebase:**
+
+    *   Create a Firebase project in the [Firebase Console](https://console.firebase.google.com/).
+    *   Enable Authentication and Firestore Database.
+    *   Obtain your Firebase configuration values.
+    *   Set the following environment variables in a `.env.local` file (create one if it doesn't exist):
+
+        ```
+        NEXT_PUBLIC_FIREBASE_API_KEY=YOUR_API_KEY
+        NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=YOUR_AUTH_DOMAIN
+        NEXT_PUBLIC_FIREBASE_PROJECT_ID=YOUR_PROJECT_ID
+        NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=YOUR_STORAGE_BUCKET
+        NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=YOUR_MESSAGING_SENDER_ID
+        NEXT_PUBLIC_FIREBASE_APP_ID=YOUR_APP_ID
+        ```
+
+4.  **Run the development server:**
+
+    ```bash
+    npm run dev
+    # or
+    yarn dev
+    ```
+
+    Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+
+## Project Structure
 
 ```
-rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
-    match /books/{bookId} {
-      allow read: if true;  // Everyone can read books
-      allow create, update, delete: if request.auth != null && getUserRole(request.auth.uid) == 'admin'; // Only admins can modify
-    }
-
-  }
-}
+src/
+├── app/                # Next.js app directory (pages, layout)
+│   ├── api/            # API routes
+│   │   ├── books/        # Book-related API
+│   │   └── login/        # Login API
+│   ├── catalog/        # Catalog page
+│   └── layout.tsx      # Shared layout
+├── components/         # React components
+│   ├── auth/           # Authentication components
+│   ├── books/          # Book components
+│   ├── events/         # Event components
+│   ├── loans/          # Loan components
+│   └── ui/             # Shadcn UI components
+├── services/           # Data fetching and business logic
+│   └── bookService.ts
+├── lib/                # Utility functions and Firebase config
+│   └── firebase.ts
+└── types/              # TypeScript type definitions
+    └── Book.ts
 ```
 
-## Firestore Index Optimization
+## Learn More
 
-To ensure efficient and fast data retrieval, it's crucial to optimize your Firestore indexes. Firestore automatically indexes single fields, but for complex queries that involve multiple fields or ordering, you'll need to create composite indexes.
+To learn more about Next.js, take a look at the following resources:
 
-Here's how to identify and create necessary indexes:
+*   [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+*   [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
-1.  **Identify Complex Queries**: Look at your `src/services` directory, particularly in files like `bookService.ts`, `eventService.ts`, and `loanService.ts`. Identify queries that use multiple `where()` clauses or involve sorting (`orderBy()`).
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
 
-2.  **Check for Indexing Errors**: When you run a query that requires an index that doesn't exist, Firestore will usually provide an error message in your browser's console. This error message will include a link to the Firestore console where you can create the missing index.
+## Deploy on Vercel
 
-3.  **Create Composite Indexes**:
-    *   Go to the [Firebase Console](https://console.firebase.google.com/).
-    *   Select your project.
-    *   Navigate to "Firestore Database".
-    *   Click on the "Indexes" tab.
-    *   Create the indexes as suggested by the error messages or based on your query patterns.
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/) from the creators of Next.js.
 
-Example:
-
-If you have a query that filters books by `author` and sorts them by `title`, you'll need a composite index on `author` (ascending) and `title` (ascending).
-
-By carefully creating the necessary indexes, you can significantly improve the performance and scalability of your Firestore database.
-
-## Setting up test users with different roles
-
-To test the role-based access control in your application, you need to create users with different roles in Firebase Authentication. You can do this manually through the Firebase console or programmatically using the Firebase Admin SDK.
-
-**Manual setup (Firebase Console):**
-
-1.  Go to the [Firebase Console](https://console.firebase.google.com/).
-2.  Select your project.
-3.  Navigate to "Authentication" -> "Users".
-4.  Add new users with the following email addresses:
-    *   `admin@admin.com` (Admin role)
-    *   `librarian@librarian.com` (Librarian role)
-    *   `member@member.com` (Member role)
-5.  You can set any passwords for these users.
-
-The application is designed to assign the corresponding roles to the users with the listed email suffix.
-
-Now you can log in with these users to test the different roles.
-    
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
