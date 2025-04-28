@@ -48,23 +48,23 @@ export async function getBooks(): Promise<Book[]> {
   }
 }
 
-export const searchBooks = async (query: string, filters = {}): Promise<Book[]> => {
+export const searchBooks = async (searchTerm: string): Promise<Book[]> => {
   try {
-    let q = query(collection(db, 'books'));
-    
-    // Add filters dynamically
-    Object.entries(filters).forEach(([field, value]) => {
-      if (value) q = where(field, '==', value);
-    });
-    
-    // Add full-text search if needed
-    if (query) q = where('searchKeywords', 'array-contains', query.toLowerCase());
-    
+    if (!searchTerm) {
+      return getBooks(); // If no search term, return all books
+    }
+
+    const booksCollectionRef = collection(db, BOOKS_COLLECTION);
+    // Create a query to search for books where the title contains the search term
+    const q = query(booksCollectionRef, 
+      where('title', '>=', searchTerm),
+      where('title', '<=', searchTerm + '\uf8ff') //'\uf8ff' is the last code point in the Unicode Basic Multilingual Plane, used for range queries
+    );
     const snapshot = await getDocs(q);
+    
     return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Book));
   } catch (error: any) {
-    console.error("Search failed:", error.message);
-    throw new Error(`Search operation failed: ${error.message}`);
+    console.error("Error searching books:", error.message);
+    throw new Error(`Failed to search books: ${error.message}`);
   }
 };
-
