@@ -5,6 +5,7 @@ import { getBooks, searchBooks } from '@/services/bookService';
 import type { Book } from '@/types/Book';
 import BookList from "@/components/books/BookList";
 import { Input } from "@/components/ui/input";
+import { motion } from "framer-motion";
 
 const CatalogPage = () => {
   const [books, setBooks] = useState<Book[]>([]);
@@ -32,7 +33,12 @@ const CatalogPage = () => {
   };
 
   return (
-    <div className="container mx-auto py-6">
+    <motion.div
+      className="container mx-auto py-6"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+    >
       <h1 className="text-2xl font-semibold mb-4">Book Catalog</h1>
       <Input
         type="text"
@@ -46,7 +52,7 @@ const CatalogPage = () => {
       ) : (
         <BookList books={books} />
       )}
-    </div>
+    </motion.div>
   );
 };
 
