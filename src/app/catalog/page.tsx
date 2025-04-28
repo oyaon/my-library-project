@@ -3,26 +3,28 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Input } from '@/components/ui/input';
-import { Book } from '@/types/Book';
-import { searchBooks } from '@/services/bookService';
+
+interface Book {
+  id: string;
+  title: string;
+  author: string;
+  coverImageUrl?: string;
+}
 
 export default function CatalogPage() {
   const [books, setBooks] = useState<Book[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    const fetchBooks = async () => {
-      setIsLoading(true);
+    async function fetchBooks() {
       try {
-        const fetchedBooks = await searchBooks(searchQuery);
-        setBooks(fetchedBooks);
+        const res = await fetch(`/api/books?search=${searchQuery}`);
+        const data = await res.json();
+        setBooks(data);
       } catch (error) {
         console.error('Failed to fetch books:', error);
-      } finally {
-        setIsLoading(false);
       }
-    };
+    }
 
     fetchBooks();
   }, [searchQuery]);
@@ -44,27 +46,23 @@ export default function CatalogPage() {
       />
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-        {isLoading ? (
-          <div>Loading...</div>
-        ) : (
-          books.map((book) => (
-            <motion.div
-              key={book.id}
-              className="bg-white shadow-md rounded-lg p-4 hover:shadow-xl transition-shadow"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4 }}
-            >
-              <img
-                src={book.coverImageUrl || '/placeholder.jpg'}
-                alt={book.title}
-                className="w-full h-48 object-cover rounded-md"
-              />
-              <h2 className="text-xl font-semibold mt-4">{book.title}</h2>
-              <p className="text-gray-600">{book.author}</p>
-            </motion.div>
-          ))
-        )}
+        {books.map((book) => (
+          <motion.div
+            key={book.id}
+            className="bg-white shadow-md rounded-lg p-4 hover:shadow-xl transition-shadow"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+          >
+            <img
+              src={book.coverImageUrl || '/placeholder.jpg'}
+              alt={book.title}
+              className="w-full h-48 object-cover rounded-md"
+            />
+            <h2 className="text-xl font-semibold mt-4">{book.title}</h2>
+            <p className="text-gray-600">{book.author}</p>
+          </motion.div>
+        ))}
       </div>
     </div>
   );
